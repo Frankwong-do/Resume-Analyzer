@@ -1,6 +1,6 @@
 # 📄 简历评分分析器（Resume Analyzer）
 
-一个基于 **Next.js + LangChain + RAG** 的智能简历分析工具——上传简历、粘贴 JD，自动打分、对比技能、给出改进建议。
+一个基于 **Next.js + LangChain + 全量上下文注入** 的智能简历分析工具——上传简历、粘贴 JD，自动打分、对比技能、给出改进建议。
 
 ---
 
@@ -14,7 +14,7 @@
 | ✅❌ **技能对比** | JD 要求的技能，哪些命中、哪些缺失，一目了然 |
 | 💡 **改进建议** | 针对缺失技能和项目短板，给出具体可操作的优化方向 |
 | 📥 **结果导出** | 支持导出 **PDF**（精美排版）和 **Markdown**（便于存档对比） |
-| 📚 **RAG 增强** | 可编辑的资料库（`knowledge/`），让 LLM 参考你的评分标准 |
+| 📚 **全量上下文注入** | 将 `knowledge/` 目录下的评分标准文档完整注入 Prompt，LLM 分析时参考 |
 
 ---
 
@@ -38,7 +38,7 @@
 | **Tailwind CSS 4** | 样式 | 原子化 CSS，快速开发 |
 | **LangChain** | LLM 框架 | Prompt 管理、模型调用、输出解析 |
 | **DeepSeek** | 大模型 | 智能提取 JD 技能、理解模糊描述 |
-| **RAG** | 检索增强 | 从 `knowledge/` 资料库加载参考标准，提升分析质量 |
+| **全量上下文注入** | Prompt 增强 | 将 `knowledge/` 目录下的文档完整注入 LLM Prompt 作为评分参考 |
 | **mammoth.js** | 文档解析 | 把 `.docx` 转成纯文本 |
 | **html2canvas + jsPDF** | PDF 生成 | 结果区截图 → 生成 PDF 下载 |
 
@@ -47,7 +47,7 @@
 - ✅ **降级兜底**：LLM 调用失败 → 自动切换关键词匹配，任何时候都能用
 - ✅ **双通道并集**：LLM 提取 + 关键词提取取并集，不漏技能
 - ✅ **Server Action**：API Key 留在服务端，浏览器看不到
-- ✅ **可配置 RAG**：编辑 `knowledge/*.md` 即可自定义评分标准，无需改代码
+- ✅ **可配置评分标准**：编辑 `knowledge/*.md` 即可自定义评分标准，无需改代码
 
 ---
 
@@ -56,8 +56,8 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/Frankwong-do/Resume-Analyzer
-cd resume-analyzer
+git clone https://github.com/qilin-19/Resume-Analyzer
+cd Resume-Analyzer
 ```
 
 ### 2. 安装依赖
@@ -107,12 +107,12 @@ resume-analyzer/
 ├── lib/
 │   ├── analyze.ts              # 核心分析引擎（技能匹配、项目评估、打分）
 │   ├── llm.ts                  # LangChain + DeepSeek 封装
-│   ├── rag.ts                  # RAG 模块（读取 knowledge/ 资料库）
+│   ├── rag.ts                  # 全量上下文注入（读取 knowledge/ 目录注入 Prompt）
 │   ├── exportPdf.ts            # PDF 导出
 │   └── exportMarkdown.ts       # Markdown 导出
 ├── types/
 │   └── index.ts                # TypeScript 类型定义
-├── knowledge/                  # 📚 RAG 资料库（你随便改）
+├── knowledge/                  # 📚 参考资料库（你随便改，分析时全量注入 Prompt）
 │   ├── skills-reference.md     # 各岗位技能标准参考
 │   └── grading-guide.md        # 打分标准参考
 ├── test-files/                 # 🧪 测试用文件
@@ -138,7 +138,7 @@ resume-analyzer/
         ┌───────────┼───────────┐
         ▼           ▼           ▼
    loadKnowledge  LLM提取    关键词匹配
-   (RAG资料库)   (DeepSeek)  (60+关键词字典)
+   (全量上下文)   (DeepSeek)  (60+关键词字典)
         │           │           │
         └───────────┼───────────┘
                     ▼
@@ -162,7 +162,7 @@ resume-analyzer/
 
 > **简历智能分析平台** —— 独立全栈项目
 > - 基于 Next.js + LangChain 搭建，集成 DeepSeek 大模型实现 JD 技能智能提取
-> - 使用 RAG 架构加载可配置资料库，提升分析准确率和可解释性
+> - 通过全量上下文注入将可编辑的评分标准文档完整加载到 Prompt，保证评分一致性和可定制性
 > - 支持 .docx 解析、多维度打分（技能+项目）、PDF/Markdown 导出
 > - 采用 Server Action 保护 API Key，关键词匹配作为 LLM 降级兜底方案
 
